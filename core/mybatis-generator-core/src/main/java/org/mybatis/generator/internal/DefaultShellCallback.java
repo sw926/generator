@@ -1,25 +1,28 @@
 /**
- *    Copyright 2006-2017 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2006-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.mybatis.generator.internal;
 
 import static org.mybatis.generator.internal.util.messages.Messages.getString;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.StringTokenizer;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import org.mybatis.generator.api.ShellCallback;
 import org.mybatis.generator.exception.ShellException;
 
@@ -30,14 +33,15 @@ import org.mybatis.generator.exception.ShellException;
  */
 public class DefaultShellCallback implements ShellCallback {
 
-    /** The overwrite. */
+    /**
+     * The overwrite.
+     */
     private boolean overwrite;
 
     /**
      * Instantiates a new default shell callback.
      *
-     * @param overwrite
-     *            the overwrite
+     * @param overwrite the overwrite
      */
     public DefaultShellCallback(boolean overwrite) {
         super();
@@ -95,7 +99,7 @@ public class DefaultShellCallback implements ShellCallback {
      */
     @Override
     public boolean isMergeSupported() {
-        return false;
+        return true;
     }
 
     /* (non-Javadoc)
@@ -111,8 +115,13 @@ public class DefaultShellCallback implements ShellCallback {
      */
     @Override
     public String mergeJavaFile(String newFileSource,
-            File existingFile, String[] javadocTags, String fileEncoding)
+                                File existingFile, String[] javadocTags, String fileEncoding)
             throws ShellException {
+        try {
+            return new JavaFileMergerJaxp().getNewJavaFile(newFileSource, existingFile.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         throw new UnsupportedOperationException();
     }
 }
